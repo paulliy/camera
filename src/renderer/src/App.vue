@@ -3,12 +3,15 @@ import { ref } from 'vue'
 const bgcolor = ref('var(--photo-bg)')
 const camcolor = ref('var(--photo-secondary)')
 const bgimg = ref('url(/Dots.svg)')
+// const primecolor = ref('var(--photo-primary-container)')
 </script>
 
 <template>
   <main>
     <div class="controls">
-      <input type="button" name="button" value="Button" />
+      <button type="button" class="icon-button" aria-label="Button">
+        <img src="/leftchevronphoto.svg" alt="left chevron" />
+      </button>
     </div>
     <div class="box">
       <img src="/folder.svg" />
@@ -43,5 +46,18 @@ main {
   height: 211px;
   width: 341px;
   margin: auto;
+  align-content: center;
+  background-color: aliceblue;
+}
+.icon-button {
+  background-color: var(--secondary);
+  --secondary: v-bind(camcolor);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  scale: 200%;
+}
+.icon-button img {
+  display: block;
 }
 </style>
