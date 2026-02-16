@@ -1,15 +1,21 @@
 <script setup lang="ts">
+import { electron } from 'process'
 import { ref } from 'vue'
-const bgcolor = ref('var(--photo-bg)')
-const camcolor = ref('var(--photo-secondary)')
-const bgimg = ref('url(/Dots.svg)')
-// const primecolor = ref('var(--photo-primary-container)')
+// true = photo mode & buttons are clicked, false = video mode & buttons arnt clicked
+const bgcolor = ref(true)
+const camcolor = ref(true)
+const bgimg = ref(true)
+const butselect = ref(false)
+//const primecolor = ref('var(--photo-primary-container)')
+async function settings(): Promise<void> {
+  const mode: boolean = await window.electron.ipcRenderer.invoke('settings')
+}
 </script>
 
 <template>
   <main>
     <div class="controls">
-      <button type="button" class="icon-button" aria-label="Button">
+      <button type="button" class="icon-button" aria-label="Button" @click="settings">
         <img src="/leftchevronphoto.svg" alt="left chevron" />
       </button>
     </div>
@@ -21,8 +27,7 @@ const bgimg = ref('url(/Dots.svg)')
 
 <style scoped>
 main {
-  background-color: var(--background);
-  --background: v-bind(bgcolor);
+  background-color: v-bind('bgcolor ? "let(--dark-green)" : "let(--grey-light)"');
   background-image: v-bind(bgimg);
   background-size: 250px;
   width: 100vw;
@@ -50,9 +55,8 @@ main {
   background-color: aliceblue;
 }
 .icon-button {
-  background-color: var(--secondary);
-  --secondary: v-bind(camcolor);
-  border: none;
+  border-radius: var(--buttonradius);
+  --buttonradiun: v-bind(butselect);
   padding: 0;
   cursor: pointer;
   scale: 200%;

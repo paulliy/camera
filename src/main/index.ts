@@ -49,8 +49,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle('settings', function switchsettings() {
+    console.log('switched settings')
+  })
 
   createWindow()
 
