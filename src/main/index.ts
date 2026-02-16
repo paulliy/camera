@@ -49,9 +49,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle('settings', function switchsettings() {
-    console.log('switched settings')
-  })
+  // ipcMain.handle('settings', function switchsettings() {
+  //   console.log('switched settings')
+  // })
 
   createWindow()
 
