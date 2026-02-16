@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-const bgcolor = ref('var(--photo-bg)')
-const camcolor = ref('var(--photo-secondary)')
-const bgimg = ref('url(/Dots.svg)')
-// const primecolor = ref('var(--photo-primary-container)')
+// true = photo mode & buttons are clicked, false = video mode & buttons arnt clicked
+const bgcolor = ref(true)
+const camcolor = ref(true)
+const bgimg = ref(true)
+const butselect = ref(false)
+//const primecolor = ref('var(--photo-primary-container)')
+async function settings(): Promise<void> {
+  const mode: boolean = await window.electron.ipcRenderer.invoke('settings')
+  console.log('Mode:', mode)
+}
 </script>
 
 <template>
   <main>
     <div class="controls">
-      <button type="button" class="icon-button" aria-label="Button">
+      <button type="button" class="icon-button" aria-label="Button" @click="settings">
         <img src="/leftchevronphoto.svg" alt="left chevron" />
       </button>
     </div>
@@ -21,9 +27,8 @@ const bgimg = ref('url(/Dots.svg)')
 
 <style scoped>
 main {
-  background-color: var(--background);
-  --background: v-bind(bgcolor);
-  background-image: v-bind(bgimg);
+  background-color: v-bind('bgcolor ? "var(--photo-bg)" : "var(--video-bg)"');
+  background-image: v-bind('bgimg ? "url(/Dots.svg)" : "url(/Squares.svg)"');
   background-size: 250px;
   width: 100vw;
   height: 100vh;
@@ -40,7 +45,7 @@ main {
   border-width: 25px;
   border-style: solid;
   border-color: var(--secondary);
-  --secondary: v-bind(camcolor);
+  --secondary: v-bind('camcolor ? "var(--photo-secondary)" : "var(--video-secondary)"');
 }
 .controls {
   height: 211px;
@@ -50,9 +55,8 @@ main {
   background-color: aliceblue;
 }
 .icon-button {
-  background-color: var(--secondary);
-  --secondary: v-bind(camcolor);
-  border: none;
+  border-radius: var(--buttonradius);
+  --buttonradius: v-bind('butselect ? "50%" : "0px"');
   padding: 0;
   cursor: pointer;
   scale: 200%;
