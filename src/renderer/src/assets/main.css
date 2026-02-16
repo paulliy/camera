@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@700&display=swap');
+
+:root {
+  --photo-bg: #1d1b20;
+  --photo-primary-contanier: #eaddff;
+  --photo-primary: #6750a4;
+  --photo-secondary: #625b71;
+  --video-bg: #31111d;
+  --video-primary-container: #ffd8e4;
+  --video-primary: #7d5260;
+  --video-secondary: #633b48;
+
+  --font-google-sans-flex: Google Sans Flex;
+}
+body {
+  margin: 0;
+  line-height: normal;
+}
