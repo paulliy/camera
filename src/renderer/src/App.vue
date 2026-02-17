@@ -17,7 +17,7 @@ async function settings(): Promise<void> {
 }
 const mainBgColor = computed(() => (bgcolor.value ? 'var(--photo-bg)' : 'var(--video-bg)'))
 const mainBgImage = computed(() => (bgimg.value ? 'url(/Dots.svg)' : 'url(/Squares.svg)'))
-const mainBgImagesize = computed(() => (bgimg.value ? '450px' : '750px'))
+const mainBgImagesize = computed(() => (bgimg.value ? '400px' : '700px'))
 const mainCamColor = computed(() =>
   camcolor.value ? 'var(--photo-secondary)' : 'var(--video-secondary)'
 )
@@ -31,7 +31,7 @@ const butborder = computed(() => (butselect.value ? '15px' : '30px'))
   <main>
     <div class="controls">
       <button type="button" class="icon-button" aria-label="Button" @click="settings">
-        <img src="/leftchevronphoto.svg" alt="left chevron" />
+        <img src="/rightchevronphoto.svg" alt="left chevron" />
       </button>
     </div>
     <div class="box">
@@ -71,13 +71,13 @@ main {
 .icon-button {
   background-color: v-bind(mainContanierColor);
   border-radius: v-bind(butborder);
-  /* border-color: transparent; */
   padding: 0;
   cursor: pointer;
   width: 50px;
   height: 60px;
 }
 .icon-button img {
-  display: block;
+  width: 100%;
+  height: 100%;
 }
 </style>
