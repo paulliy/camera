@@ -9,8 +9,8 @@ const modeselect = ref(false)
 const contcolor = ref(true)
 const capturecolor = ref(true)
 const captureicon = ref(true)
-//const primecolor = ref('var(--photo-primary-container)')
 async function mode(): Promise<void> {
+  //flip all the ui values from photo to video or vice versax`
   bgcolor.value = !bgcolor.value
   camcolor.value = !camcolor.value
   bgimg.value = !bgimg.value
@@ -19,6 +19,22 @@ async function mode(): Promise<void> {
   capturecolor.value = !capturecolor.value
   captureicon.value = !captureicon.value
   // const mode: boolean = await window.electron.ipcRenderer.invoke('settings')
+}
+async function reqmicperms(): Promise<void> {
+  const micpermsstatus = await window.electron.ipcRenderer.invoke('reqmicperms')
+  if (micpermsstatus) {
+    console.log('im all good')
+  } else {
+    console.log('im so not good')
+  }
+}
+async function reqcamperms(): Promise<void> {
+  const campermsstatus = await window.electron.ipcRenderer.invoke('reqmicperms')
+  if (campermsstatus) {
+    console.log('im all good')
+  } else {
+    console.log('im so not good')
+  }
 }
 const mainBgColor = computed(() => (bgcolor.value ? 'var(--photo-bg)' : 'var(--video-bg)'))
 const mainBgImage = computed(() => (bgimg.value ? 'url(/Dots.svg)' : 'url(/Squares.svg)'))
@@ -37,10 +53,27 @@ const modeborder = computed(() => (modeselect.value ? '15px' : '30px'))
 const modetext = computed(() => (modeselect.value ? 'Video' : 'Photo'))
 const maincaptureicon = computed(() => (captureicon.value ? '/cameraF.svg' : '/videoF.svg'))
 </script>
-
 <template>
   <main>
     <div class="controls">
+      <div class="permissions-icon-box">
+        <button
+          type="button"
+          class="perm-button"
+          aria-label="Microphone Permissions Button"
+          @click="reqmicperms"
+        >
+          <img src="/micPermsOff.svg" alt="perm button" />
+        </button>
+        <button
+          type="button"
+          class="perm-button"
+          aria-label="Camera Permissions Button"
+          @click="reqcamperms"
+        >
+          <img src="/camPermsOff.svg" alt="perm button" />
+        </button>
+      </div>
       <button type="button" class="text-button" aria-label="Mode button" @click="mode">
         {{ modetext }}
       </button>
@@ -101,6 +134,34 @@ main {
   width: 50px;
   height: 60px;
 }
+.perm-button {
+  background-color: transparent;
+  border-width: 0px;
+  padding: 0;
+  cursor: pointer;
+  width: 50px;
+  height: 60px;
+}
+.perm-button:hover {
+  transition: all 0.2s ease-in-out;
+  filter: brightness(0.95);
+  transform: scale(1.05);
+}
+.perm-button:active {
+  transition: all 0.1s ease-in-out;
+  filter: brightness(0.9);
+  transform: scale(1);
+}
+.icon-button:hover {
+  transition: all 0.2s ease-in-out;
+  filter: brightness(0.95);
+  transform: scale(1.05);
+}
+.icon-button:active {
+  transition: all 0.1s ease-in-out;
+  filter: brightness(0.9);
+  transform: scale(1);
+}
 .icon-button img {
   width: 100%;
   height: 100%;
@@ -115,6 +176,16 @@ main {
   height: 60px;
   font-family: var(--font-google-sans-flex);
 }
+.text-button:hover {
+  transition: all 0.2s ease-in-out;
+  filter: brightness(0.95);
+  transform: scale(1.05);
+}
+.text-button:active {
+  transition: all 0.1s ease-in-out;
+  filter: brightness(0.9);
+  transform: scale(1);
+}
 .capture {
   background-color: v-bind(mainCaptureColor);
   border-color: v-bind(mainContanierColor);
@@ -124,5 +195,19 @@ main {
   cursor: pointer;
   width: 141px;
   height: 141px;
+}
+.capture:hover {
+  transition: all 0.2s ease-in-out;
+  filter: brightness(0.9);
+  transform: scale(1.0025);
+}
+.capture:active {
+  transition: all 0.1s ease-in-out;
+  filter: brightness(0.75);
+  transform: scale(0.95);
+}
+.permissions-icon-box {
+  width: 60px;
+  height: 120px;
 }
 </style>
