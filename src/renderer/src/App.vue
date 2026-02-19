@@ -2,23 +2,10 @@
 import { ref, computed } from 'vue'
 // true = photo mode & buttons are clicked, false = video mode & buttons arnt clicked
 const bgcolor = ref(true)
-const camcolor = ref(true)
-const bgimg = ref(true)
 const butselect = ref(false)
-const modeselect = ref(false)
-const contcolor = ref(true)
-const capturecolor = ref(true)
-const captureicon = ref(true)
 async function mode(): Promise<void> {
   //flip all the ui values from photo to video or vice versax`
   bgcolor.value = !bgcolor.value
-  camcolor.value = !camcolor.value
-  bgimg.value = !bgimg.value
-  contcolor.value = !contcolor.value
-  modeselect.value = !modeselect.value
-  capturecolor.value = !capturecolor.value
-  captureicon.value = !captureicon.value
-  // const mode: boolean = await window.electron.ipcRenderer.invoke('settings')
 }
 async function reqmicperms(): Promise<void> {
   const micpermsstatus = await window.electron.ipcRenderer.invoke('reqmicperms')
@@ -37,21 +24,21 @@ async function reqcamperms(): Promise<void> {
   }
 }
 const mainBgColor = computed(() => (bgcolor.value ? 'var(--photo-bg)' : 'var(--video-bg)'))
-const mainBgImage = computed(() => (bgimg.value ? 'url(/Dots.svg)' : 'url(/Squares.svg)'))
-const mainBgImagesize = computed(() => (bgimg.value ? '400px' : '700px'))
+const mainBgImage = computed(() => (bgcolor.value ? 'url(/Dots.svg)' : 'url(/Squares.svg)'))
+const mainBgImagesize = computed(() => (bgcolor.value ? '400px' : '700px'))
 const mainCamColor = computed(() =>
-  camcolor.value ? 'var(--photo-secondary)' : 'var(--video-secondary)'
+  bgcolor.value ? 'var(--photo-secondary)' : 'var(--video-secondary)'
 )
 const mainContanierColor = computed(() =>
-  contcolor.value ? 'var(--photo-primary-container)' : 'var(--video-primary-container)'
+  bgcolor.value ? 'var(--photo-primary-container)' : 'var(--video-primary-container)'
 )
 const mainCaptureColor = computed(() =>
-  capturecolor.value ? 'var(--photo-primary)' : 'var(--video-primary)'
+  bgcolor.value ? 'var(--photo-primary)' : 'var(--video-primary)'
 )
 const butborder = computed(() => (butselect.value ? '15px' : '30px'))
-const modeborder = computed(() => (modeselect.value ? '15px' : '30px'))
-const modetext = computed(() => (modeselect.value ? 'Video' : 'Photo'))
-const maincaptureicon = computed(() => (captureicon.value ? '/cameraF.svg' : '/videoF.svg'))
+const modeborder = computed(() => (bgcolor.value ? '30px' : '15px'))
+const modetext = computed(() => (bgcolor.value ? 'Video' : 'Photo'))
+const maincaptureicon = computed(() => (bgcolor.value ? '/cameraF.svg' : '/videoF.svg'))
 </script>
 <template>
   <main>
