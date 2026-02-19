@@ -49,10 +49,12 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // ipcMain.handle('settings', function switchsettings() {
-  //   console.log('switched settings')
-  // })
-
+  ipcMain.handle('reqmicperms', function () {
+    return true
+  })
+  ipcMain.handle('reqcamperms', function () {
+    return true
+  })
   createWindow()
 
   app.on('activate', function () {

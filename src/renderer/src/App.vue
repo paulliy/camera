@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import Permissions from './components/Permissions.vue'
+import Options from './components/Options.vue'
 // true = photo mode & buttons are clicked, false = video mode & buttons arnt clicked
 const bgcolor = ref(true)
-const butselect = ref(false)
+const campermstatus = ref(false)
+const micpermstatus = ref(false)
 async function mode(): Promise<void> {
   //flip all the ui values from photo to video or vice versax`
   bgcolor.value = !bgcolor.value
 }
 async function reqmicperms(): Promise<void> {
-  const micpermsstatus = await window.electron.ipcRenderer.invoke('reqmicperms')
-  if (micpermsstatus) {
+  micpermstatus.value = await window.electron.ipcRenderer.invoke('reqmicperms')
+  if (micpermstatus.value) {
     console.log('im all good')
   } else {
     console.log('im so not good')
   }
 }
 async function reqcamperms(): Promise<void> {
-  const campermsstatus = await window.electron.ipcRenderer.invoke('reqmicperms')
-  if (campermsstatus) {
+  campermstatus.value = await window.electron.ipcRenderer.invoke('reqcamperms')
+  if (campermstatus.value) {
     console.log('im all good')
   } else {
     console.log('im so not good')
@@ -35,31 +38,20 @@ const mainContanierColor = computed(() =>
 const mainCaptureColor = computed(() =>
   bgcolor.value ? 'var(--photo-primary)' : 'var(--video-primary)'
 )
-const butborder = computed(() => (butselect.value ? '15px' : '30px'))
 const modeborder = computed(() => (bgcolor.value ? '30px' : '15px'))
-const modetext = computed(() => (bgcolor.value ? 'Video' : 'Photo'))
+const modetext = computed(() => (bgcolor.value ? 'Photo' : 'Video'))
 const maincaptureicon = computed(() => (bgcolor.value ? '/cameraF.svg' : '/videoF.svg'))
+const camPermIconOn = computed(() => (bgcolor.value ? '/camPermsOnP.svg' : 'camPermsOnV.svg'))
+const micPermIconOn = computed(() => (bgcolor.value ? '/micPermsOnP.svg' : 'micPermsOnV.svg'))
+const micPermImg = computed(() => (micpermstatus.value ? micPermIconOn.value : '/micPermsOff.svg'))
+const camPermImg = computed(() => (campermstatus.value ? camPermIconOn.value : '/camPermsOff.svg'))
 </script>
 <template>
   <main>
     <div class="controls">
       <div class="permissions-icon-box">
-        <button
-          type="button"
-          class="perm-button"
-          aria-label="Microphone Permissions Button"
-          @click="reqmicperms"
-        >
-          <img src="/micPermsOff.svg" alt="perm button" />
-        </button>
-        <button
-          type="button"
-          class="perm-button"
-          aria-label="Camera Permissions Button"
-          @click="reqcamperms"
-        >
-          <img src="/camPermsOff.svg" alt="perm button" />
-        </button>
+        <Permissions :image="micPermImg" @click="reqmicperms" />
+        <Permissions :image="camPermImg" @click="reqcamperms" />
       </div>
       <button type="button" class="text-button" aria-label="Mode button" @click="mode">
         {{ modetext }}
@@ -67,9 +59,9 @@ const maincaptureicon = computed(() => (bgcolor.value ? '/cameraF.svg' : '/video
       <button type="button" class="capture" aria-label="Capture button" @click="">
         <img :src="maincaptureicon" alt="capture button" />
       </button>
-      <button type="button" class="icon-button" aria-label="Settings Button" @click="">
-        <img src="/rightchevronphoto.svg" alt="left chevron" />
-      </button>
+      <div>
+        <Options :bgcolor :mainContanierColor />
+      </div>
     </div>
     <div class="box">
       <img src="/maincamoff.svg" />
@@ -92,7 +84,6 @@ main {
   border-radius: 15px;
   position: relative;
   background-color: black;
-  max-width: 100%;
   margin: auto;
   border-width: 25px;
   border-style: solid;
@@ -103,65 +94,27 @@ main {
 }
 .controls {
   height: 211px;
-  width: 100vw;
+  width: 1330px;
   margin: auto;
   align-items: center;
   background-color: transparent;
   display: flex;
-  flex-direction: horizontal;
   justify-content: center;
   position: relative;
   column-gap: 10px;
 }
-.icon-button {
-  background-color: v-bind(mainContanierColor);
-  border-radius: v-bind(butborder);
-  padding: 0;
-  cursor: pointer;
-  width: 50px;
-  height: 60px;
-}
-.perm-button {
-  background-color: transparent;
-  border-width: 0px;
-  padding: 0;
-  cursor: pointer;
-  width: 50px;
-  height: 60px;
-}
-.perm-button:hover {
-  transition: all 0.2s ease-in-out;
-  filter: brightness(0.95);
-  transform: scale(1.05);
-}
-.perm-button:active {
-  transition: all 0.1s ease-in-out;
-  filter: brightness(0.9);
-  transform: scale(1);
-}
-.icon-button:hover {
-  transition: all 0.2s ease-in-out;
-  filter: brightness(0.95);
-  transform: scale(1.05);
-}
-.icon-button:active {
-  transition: all 0.1s ease-in-out;
-  filter: brightness(0.9);
-  transform: scale(1);
-}
-.icon-button img {
-  width: 100%;
-  height: 100%;
-}
 .text-button {
   background-color: v-bind(mainContanierColor);
   border-radius: v-bind(modeborder);
+  border-width: 0px;
   padding: 0;
   cursor: pointer;
   font-size: 20px;
   width: 130px;
   height: 60px;
   font-family: var(--font-google-sans-flex);
+  position: absolute;
+  left: 450px;
 }
 .text-button:hover {
   transition: all 0.2s ease-in-out;
@@ -182,6 +135,8 @@ main {
   cursor: pointer;
   width: 141px;
   height: 141px;
+  position: absolute;
+  left: auto;
 }
 .capture:hover {
   transition: all 0.2s ease-in-out;
@@ -194,7 +149,9 @@ main {
   transform: scale(0.95);
 }
 .permissions-icon-box {
+  position: absolute;
   width: 60px;
   height: 120px;
+  left: 380px;
 }
 </style>
