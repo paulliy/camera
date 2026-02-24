@@ -10,21 +10,31 @@ async function mode(): Promise<void> {
   //flip all the ui values from photo to video or vice versax`
   bgcolor.value = !bgcolor.value
 }
+const videostream = ref(new MediaStream())
 async function reqmicperms(): Promise<void> {
-  micpermstatus.value = await window.electron.ipcRenderer.invoke('reqmicperms')
-  if (micpermstatus.value) {
-    console.log('im all good')
-  } else {
-    console.log('im so not good')
-  }
+  videostream.value.addTrack(
+    (await navigator.mediaDevices.getUserMedia({ audio: true })).getTracks()[0]
+  )
+  micpermstatus.value = true
 }
+
 async function reqcamperms(): Promise<void> {
-  campermstatus.value = await window.electron.ipcRenderer.invoke('reqcamperms')
-  if (campermstatus.value) {
-    console.log('im all good')
-  } else {
-    console.log('im so not good')
-  }
+  navigator.mediaDevices
+    .getUserMedia({ video: true })
+    .then(async function (stream) {
+      while (stream.getTracks().length < 1) {
+        await new Promise((resolve) => setTimeout(resolve, 200))
+      }
+      videostream.value.addTrack(stream.getTracks()[0])
+      const videoElement = document.getElementById('camera') as HTMLVideoElement
+      if (videoElement) {
+        videoElement.srcObject = videostream.value
+      }
+      campermstatus.value = true
+    })
+    .catch(function (err) {
+      alert(err)
+    })
 }
 const mainBgColor = computed(() => (bgcolor.value ? 'var(--photo-bg)' : 'var(--video-bg)'))
 const mainBgImage = computed(() => (bgcolor.value ? 'url(/Dots.svg)' : 'url(/Squares.svg)'))
@@ -41,8 +51,8 @@ const mainCaptureColor = computed(() =>
 const modeborder = computed(() => (bgcolor.value ? '30px' : '15px'))
 const modetext = computed(() => (bgcolor.value ? 'Photo' : 'Video'))
 const maincaptureicon = computed(() => (bgcolor.value ? '/cameraF.svg' : '/videoF.svg'))
-const camPermIconOn = computed(() => (bgcolor.value ? '/camPermsOnP.svg' : 'camPermsOnV.svg'))
-const micPermIconOn = computed(() => (bgcolor.value ? '/micPermsOnP.svg' : 'micPermsOnV.svg'))
+const camPermIconOn = computed(() => (bgcolor.value ? '/camPermsOnP.svg' : '/camPermsOnV.svg'))
+const micPermIconOn = computed(() => (bgcolor.value ? '/micPermsOnP.svg' : '/micPermsOnV.svg'))
 const micPermImg = computed(() => (micpermstatus.value ? micPermIconOn.value : '/micPermsOff.svg'))
 const camPermImg = computed(() => (campermstatus.value ? camPermIconOn.value : '/camPermsOff.svg'))
 </script>
@@ -56,7 +66,7 @@ const camPermImg = computed(() => (campermstatus.value ? camPermIconOn.value : '
       <button type="button" class="text-button" aria-label="Mode button" @click="mode">
         {{ modetext }}
       </button>
-      <button type="button" class="capture" aria-label="Capture button" @click="">
+      <button type="button" class="capture" aria-label="Capture button">
         <img :src="maincaptureicon" alt="capture button" />
       </button>
       <div>
@@ -64,7 +74,7 @@ const camPermImg = computed(() => (campermstatus.value ? camPermIconOn.value : '
       </div>
     </div>
     <div class="box">
-      <img src="/maincamoff.svg" />
+      <video id="camera" autoplay height="720" width="1280"></video>
     </div>
   </main>
 </template>
