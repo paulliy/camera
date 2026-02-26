@@ -6,6 +6,21 @@ import Options from './components/Options.vue'
 const bgcolor = ref(true)
 const campermstatus = ref(false)
 const micpermstatus = ref(false)
+const picturesrc = ref('/timer.svg')
+function capturedframe(): void {
+  if (!campermstatus.value) return
+  const video = document.getElementById('camera') as HTMLVideoElement
+  const canvas = document.getElementById('capturedframe') as HTMLCanvasElement
+  canvas.width = video.videoWidth
+  canvas.height = video.videoHeight
+  canvas.getContext('2d')!.drawImage(video, 0, 0)
+  canvas.toBlob((blob) => {
+    if (!blob) return
+    const url = URL.createObjectURL(blob)
+    if (picturesrc.value.startsWith('blob:')) URL.revokeObjectURL(picturesrc.value)
+    picturesrc.value = url
+  }, 'image/png')
+}
 async function mode(): Promise<void> {
   //flip all the ui values from photo to video or vice versax`
   bgcolor.value = !bgcolor.value
@@ -58,7 +73,9 @@ const camPermImg = computed(() => (campermstatus.value ? camPermIconOn.value : '
 </script>
 <template>
   <main>
+    <canvas id="capturedframe"></canvas>
     <div class="controls">
+      <img id="picture" alt="recently taken photo" :src="picturesrc" />
       <div class="permissions-icon-box">
         <Permissions :image="micPermImg" @click="reqmicperms" />
         <Permissions :image="camPermImg" @click="reqcamperms" />
@@ -66,20 +83,35 @@ const camPermImg = computed(() => (campermstatus.value ? camPermIconOn.value : '
       <button type="button" class="text-button" aria-label="Mode button" @click="mode">
         {{ modetext }}
       </button>
-      <button type="button" class="capture" aria-label="Capture button">
+      <button type="button" class="capture" aria-label="Capture button" @click="capturedframe">
         <img :src="maincaptureicon" alt="capture button" />
       </button>
       <div>
         <Options :bgcolor :mainContanierColor />
       </div>
     </div>
-    <div class="box">
-      <video id="camera" autoplay height="720" width="1280"></video>
+    <div :class="['box', { 'has-content': campermstatus }]">
+      <video id="camera" autoplay muted height="720px"></video>
     </div>
   </main>
 </template>
 
 <style scoped>
+#capturedframe {
+  display: none;
+}
+#picture {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  left: 230px;
+  top: 45px;
+  border-width: 5px;
+  border-style: solid;
+  border-radius: 15px;
+  border-color: v-bind(mainContanierColor);
+}
 main {
   background-color: v-bind(mainBgColor);
   background-image: v-bind(mainBgImage);
@@ -101,6 +133,10 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.box.has-content {
+  width: fit-content;
+  height: fit-content;
 }
 .controls {
   height: 211px;
